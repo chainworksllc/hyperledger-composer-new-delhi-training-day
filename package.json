@@ -1,0 +1,40 @@
+{
+  "name": "chainworks-foodprovenance",
+  "version": "0.0.1",
+  "description": "A network to track a restaurant&#39;s raw ingredients from seed to sale",
+  "scripts": {
+    "prepublish": "mkdirp ./dist && composer archive create --sourceType dir --sourceName . -a ./dist/chainworks-foodprovenance.bna",
+    "pretest": "npm run lint",
+    "lint": "eslint .",
+    "test": "nyc mocha -t 0 test/*.js && cucumber-js",
+    "bootFabric": "./fabric-tools/downloadFabric.sh && ./fabric-tools/startFabric.sh",
+    "shutdownFabric": "./fabric-tools/stopFabric.sh && ./fabric-tools/teardownFabric.sh",
+    "resetAllFabric": "rm -rf ~/.composer/cards && rm -rf ~/.composer/client-data && npm run shutdownFabric && npm run bootFabric && ./fabric-tools/createPeerAdminCard.sh",
+    "installNetwork": "composer network install -c PeerAdmin@hlfv1 --archiveFile ./dist/chainworks-foodprovenance.bna",
+    "startNetwork": "composer network start --networkName chainworks-foodprovenance --networkVersion 0.0.1 --networkAdmin admin --networkAdminEnrollSecret adminpw --card PeerAdmin@hlfv1 -f networkadmin.card",
+    "importCard": "composer card import --file networkadmin.card",
+    "pingNetwork": "composer network ping --card admin@chainworks-foodprovenance",
+    "deployNetwork": "npm run prepublish && npm run installNetwork && npm run startNetwork && npm run importCard && npm run pingNetwork",
+    "updateNetwork": "npm run prepublish && composer network update -a ./dist/chainworks-foodprovenance.bna -c admin@chainworks-foodprovenance && npm run pingNetwork",
+    "startServer": "composer-rest-server --card admin@chainworks-foodprovenance -p 3000 -n 'never'",
+    "resetAndStart": "npm run resetAllFabric && npm run deployNetwork && npm run startServer"
+  },
+  "author": "Chainworks LLC",
+  "email": "zach@chainworks.com",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "composer-admin": "^0.19.0",
+    "composer-cli": "^0.19.0",
+    "composer-client": "^0.19.0",
+    "composer-common": "^0.19.0",
+    "composer-connector-embedded": "^0.19.0",
+    "composer-cucumber-steps": "^0.19.0",
+    "chai": "latest",
+    "chai-as-promised": "latest",
+    "cucumber": "^2.2.0",
+    "eslint": "latest",
+    "nyc": "latest",
+    "mkdirp": "latest",
+    "mocha": "latest"
+  }
+}

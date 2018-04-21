@@ -1,0 +1,56 @@
+rule NetworkAdminUser {
+    description: "Grant business network administrators full access to user resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule NetworkAdminSystem {
+    description: "Grant business network administrators full access to system resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
+
+rule CanSeeOwnShipment {
+    description: "Participants can only see shipments which they are a part of"
+    participant(p): "chainworks.foodprovenance.Restaurant"
+    operation: ALL
+    resource(r): "chainworks.foodprovenance.Shipment"
+    condition: (r.contract.supplier.getIdentifier() !== p.getIdentifier() && r.contract.distributor.getIdentifier() !== p.getIdentifier() && r.contract.restaurant.getIdentifier() !== p.getIdentifier())
+    action: DENY
+}
+
+rule RestaurantCannotCreateShipment {
+  description: "Restaurant cannot create shipment"
+  participant: "chainworks.foodprovenance.Restaurant"
+  operation: CREATE, DELETE, UPDATE
+  resource: "chainworks.foodprovenance.Contract"
+  action: DENY
+}
+
+rule SupplierCannotCreateContract {
+  description: "Restaurant cannot create shipment"
+  participant: "chainworks.foodprovenance.Supplier"
+  operation: CREATE, DELETE, UPDATE
+  resource: "chainworks.foodprovenance.Shipment"
+  action: DENY
+}
+
+rule Default {
+    description: "Allow all participants access to all resources"
+    participant: "ANY"
+    operation: ALL
+    resource: "chainworks.foodprovenance.*"
+    action: ALLOW
+}
+
+rule SystemACL {
+  description:  "System ACL to permit all access"
+  participant: "org.hyperledger.composer.system.Participant"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
